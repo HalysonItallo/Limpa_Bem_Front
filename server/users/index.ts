@@ -1,21 +1,31 @@
 import apiClient from "server/client";
 
-const CLIENTE_GROUP_ID = 1;
+const CLIENTE_GROUP_ID = 4;
 
 export type User = {
-  name: string;
-  address: string;
+  id: number;
+  first_name: string;
+  adress: string;
   cellphone: string;
   username: string;
   password: string;
-  // group?
+  group_name: string;
 };
 
+export type Attendant = User;
+
+export type Helper = User;
+
+export type Client = User;
+
 export type UserLoginDTO = Pick<User, "username" | "password">;
+
 export type UserRegisterDTO = User;
 
 type JWTToken = {
   token: string;
+  user_id: number;
+  group_name: string;
 };
 
 export const makeLogin = async ({
@@ -36,9 +46,9 @@ export const makeLogin = async ({
 
 export const registerUser = async (user: UserRegisterDTO): Promise<boolean> => {
   try {
-    const request = await apiClient.post<JWTToken>("register/", {
+    const request = await apiClient.post<JWTToken>("persons/", {
       ...user,
-      group: CLIENTE_GROUP_ID,
+      groups: [CLIENTE_GROUP_ID],
     });
     const wasRequestSucessfully = request?.data !== undefined;
 
@@ -46,6 +56,24 @@ export const registerUser = async (user: UserRegisterDTO): Promise<boolean> => {
   } catch (e) {
     throw e;
   }
+};
 
-  return false;
+export const getUserById = async (id: number) => {
+  try {
+    const request = await apiClient.get<User>(`persons/${id}`);
+
+    return request.data;
+  } catch (e) {
+    throw e;
+  }
+};
+
+export const getAllHelpers = async () => {
+  try {
+    const request = await apiClient.get<Array<User>>(`persons/`);
+
+    return request.data.filter(({ group_name }) => group_name == "helper");
+  } catch (e) {
+    throw e;
+  }
 };
