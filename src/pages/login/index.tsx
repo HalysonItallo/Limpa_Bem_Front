@@ -1,4 +1,4 @@
-import { Button, Link, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -7,6 +7,10 @@ import { useRouter } from "next/router";
 import { useCallback } from "react";
 import Loading from "@/components/Loading";
 import { useState } from "react";
+import apiClient from "server/client";
+import Link from "next/link";
+
+export type Permissions = "cliente" | "gerente" | "helper" | "atendente";
 
 export default function Login() {
   const router = useRouter();
@@ -22,10 +26,31 @@ export default function Login() {
       setIsLoading(true);
       const loginAttempt = await makeLogin(loginCredentials);
       const userToken = loginAttempt?.token;
+      const groupName = loginAttempt?.group_name;
+      const userIdFromToken = loginAttempt?.user_id;
+
+      console.log({ loginAttempt });
 
       if (loginAttempt?.token !== undefined) {
-        sessionStorage.setItem("token", String(userToken));
-        redirectToHome();
+        localStorage.setItem("token", String(userToken));
+        localStorage.setItem("userId", String(userIdFromToken));
+
+        switch (groupName) {
+          case "cliente":
+            router.push("/client");
+            break;
+          case "gerente":
+            router.push("/manager");
+            break;
+          case "gerente":
+            router.push("/helper");
+            break;
+          case "atendente":
+            router.push("/attendant");
+            break;
+          default:
+            router.push("/client");
+        }
       }
     } catch (e) {
       console.error(e);
@@ -35,7 +60,7 @@ export default function Login() {
   };
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (token !== null) {
       redirectToHome();
@@ -101,7 +126,7 @@ export default function Login() {
             }}
           >
             <Link href="/register">Não tem login? Registre-se</Link>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={isLoading}>
               Entrar
             </Button>
           </Box>

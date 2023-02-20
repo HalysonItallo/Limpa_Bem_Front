@@ -1,4 +1,4 @@
-import { Button, Link, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
@@ -6,6 +6,7 @@ import Loading from "@/components/Loading";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import Link from 'next/link'
 import { UserRegisterDTO, registerUser } from "../../../server/users";
 
 export default function Register() {
@@ -18,11 +19,12 @@ export default function Register() {
   }, [router]);
 
   const redirectToLogin = useCallback(() => {
-    router.push("/");
+    router.push("/login");
   }, [router]);
 
   const onSubmit: SubmitHandler<UserRegisterDTO> = async (userData) => {
     try {
+      console.log({ userData });
       setIsLoading(true);
       const registerAttempt = await registerUser(userData);
 
@@ -38,7 +40,7 @@ export default function Register() {
   };
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (token !== null) {
       redirectToHome();
@@ -64,7 +66,10 @@ export default function Register() {
         <Typography variant="h4" sx={{ mb: 4 }}>
           Bem vindo ao Limpa-Bem, Registre-se para continuar
         </Typography>
+
         <Box
+          onSubmit={handleSubmit(onSubmit)}
+          component="form"
           sx={{
             display: "flex",
             width: ["90%", "40%", "30%"],
@@ -81,7 +86,7 @@ export default function Register() {
           <TextField
             sx={{ width: "100%", mb: 3 }}
             label="Nome"
-            {...register("name")}
+            {...register("first_name")}
           />
           <TextField
             sx={{ width: "100%", mb: 3 }}
@@ -97,7 +102,7 @@ export default function Register() {
           <TextField
             sx={{ width: "100%", mb: 3 }}
             label="Endereço"
-            {...register("address")}
+            {...register("adress")}
           />
           <TextField
             sx={{ width: "100%", mb: 3 }}
@@ -115,7 +120,7 @@ export default function Register() {
             }}
           >
             <Link href="/login">Já tem registro? Faça login</Link>
-            <Button variant="contained">Registrar</Button>
+            <Button type="submit" variant="contained">Registrar</Button>
           </Box>
         </Box>
       </Box>
