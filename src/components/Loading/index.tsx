@@ -1,4 +1,4 @@
-import { Box, Backdrop, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const Loading = ({ isLoading }: { isLoading: boolean }) => {
   return (
