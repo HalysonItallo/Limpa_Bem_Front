@@ -30,6 +30,8 @@ npm i
 Crie no diretório raiz da aplicação um arquivo .env e coloque o seguinte conteúdo
 
 ```sh
+# ./.env
+
 NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/
 ```
 
